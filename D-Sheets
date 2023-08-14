@@ -1,0 +1,40 @@
+import google.generativeai as palm
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+# Ask for the path to the JSON credentials and the Google Sheet name
+credentials_path = input("Please provide the path to your JSON credentials file: ")
+sheet_name = input("Please provide the name of your Google Sheet: ")
+
+# Set up Google Sheets API
+scope = [
+    "https://spreadsheets.google.com/feeds", 
+    "https://www.googleapis.com/auth/spreadsheets", 
+    "https://www.googleapis.com/auth/drive.file", 
+    "https://www.googleapis.com/auth/drive"
+]
+creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
+client = gspread.authorize(creds)
+sheet = client.open(sheet_name).sheet1
+
+palm.configure(api_key="YOUR API KEY GOES IN THIS SECTION")
+
+# ... [rest of your defaults settings] ...
+
+while True:
+    user_input = input("Please provide your input or type 'exit' to stop: ")
+
+    # ... [rest of your code for palm interaction] ...
+
+    print(response.result)
+
+    # Update Google Sheets
+    next_row = len(sheet.col_values(1)) + 1  # find the next row
+    sheet.update_cell(next_row, 1, user_input)
+    sheet.update_cell(next_row, 2, response.result)
+
+    continue_response = input("Do you want to continue? (yes/no): ")
+    
+    if continue_response.lower() != 'yes':
+        print("Exiting the program.")
+        break
